@@ -1,6 +1,8 @@
 package com.JobHafen.Proxy.service;
 
 import com.JobHafen.Proxy.config.RabbitMQConfig;
+import com.JobHafen.Proxy.dto.Job;
+import com.JobHafen.Proxy.dto.Message;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +14,11 @@ public class JobPublisher {
         this.rabbitTemplate = rabbitTemplate;
     }
 
-    public void sendJob(String message) {
-        rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE, message);
+    public Job sendJobRequest(Message message) {
+        return (Job) rabbitTemplate.convertSendAndReceive(
+                "jobs.exchange",
+                "jobs.request",
+                message
+        );
     }
 }

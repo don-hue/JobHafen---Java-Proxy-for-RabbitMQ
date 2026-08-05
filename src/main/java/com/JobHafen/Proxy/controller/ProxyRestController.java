@@ -1,6 +1,7 @@
 package com.JobHafen.Proxy.controller;
 
-import com.JobHafen.Proxy.Message;
+import com.JobHafen.Proxy.dto.Job;
+import com.JobHafen.Proxy.dto.Message;
 import com.JobHafen.Proxy.service.JobPublisher;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,9 +17,7 @@ public class ProxyRestController {
         this.jobPublisher = jobPublisher;
     }
     @PostMapping("/sendJobRequest")
-    public ResponseEntity<String> publishMessage(@RequestBody Message message) {
-        jobPublisher.sendJob("Jobs requested");
-        return ResponseEntity.ok("Jobs requested");
-
+    public Job publishMessage(@RequestBody Message message) {
+        return jobPublisher.sendJobRequest(message);
     }
 }

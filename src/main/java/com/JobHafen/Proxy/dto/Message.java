@@ -1,4 +1,4 @@
-package com.JobHafen.Proxy;
+package com.JobHafen.Proxy.dto;
 public class Message {
 
     private String message;
