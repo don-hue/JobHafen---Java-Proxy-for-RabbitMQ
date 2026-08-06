@@ -14,8 +14,9 @@ public class JobPublisher {
         this.rabbitTemplate = rabbitTemplate;
     }
 
-    public Job sendJobRequest(Message message) {
-        return (Job) rabbitTemplate.convertSendAndReceive(
+    public Message sendJobRequest(Message message) {
+        System.out.println("XXX in sendJobRequest");
+        return (Message) rabbitTemplate.convertSendAndReceive(
                 "jobs.exchange",
                 "jobs.request",
                 message
