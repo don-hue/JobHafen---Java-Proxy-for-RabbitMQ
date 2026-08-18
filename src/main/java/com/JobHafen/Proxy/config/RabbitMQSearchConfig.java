@@ -1,6 +1,9 @@
 package com.JobHafen.Proxy.config;
 
-import org.springframework.amqp.core.*;
+import org.springframework.amqp.core.Binding;
+import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.DirectExchange;
+import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.DefaultClassMapper;
@@ -13,15 +16,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
-public class RabbitMQConfig {
-    public static final String EXCHANGE = "jobs.exchange";
-    public static final String REQUEST_QUEUE = "jobs.request.queue";
-    public static final String ROUTING_KEY = "jobs.request";
+public class RabbitMQSearchConfig {
+    public static final String EXCHANGE = "search.exchange";
+    public static final String SAVE_SEARCH_QUEUE = "search.save.queue";
+    public static final String ROUTING_KEY = "search.request";
 
     @Bean
-    public Queue replyJobs() {
-        return new Queue(REQUEST_QUEUE);
-    }
+    public Queue replySearch() {return new Queue(SAVE_SEARCH_QUEUE);}
 
     @Bean
     public MessageConverter messageConverter() {
@@ -45,20 +46,18 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public DirectExchange exchange() {
-        return new DirectExchange(EXCHANGE);
-    }
+    public DirectExchange exchange() {return new DirectExchange(EXCHANGE);}
 
     @Bean
-    public Binding binding() {
+    public Binding bindung(){
         return BindingBuilder
-                .bind(replyJobs())
+                .bind(replySearch())
                 .to(exchange())
                 .with(ROUTING_KEY);
     }
 
     @Bean
-    public RabbitTemplate template(ConnectionFactory connectionFactory){
+    public RabbitTemplate template(ConnectionFactory connectionFactory) {
         RabbitTemplate template = new RabbitTemplate(connectionFactory);
         template.setMessageConverter(messageConverter());
         template.setReplyTimeout(10000);
