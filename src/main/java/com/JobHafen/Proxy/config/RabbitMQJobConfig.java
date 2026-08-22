@@ -1,11 +1,13 @@
 package com.JobHafen.Proxy.config;
 
 import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.DefaultClassMapper;
 import org.springframework.amqp.support.converter.JacksonJsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -15,16 +17,30 @@ import java.util.Map;
 @Configuration
 public class RabbitMQJobConfig {
     public static final String EXCHANGE = "jobs.exchange";
-    public static final String REQUEST_QUEUE = "jobs.request.queue";
-    public static final String ROUTING_KEY = "jobs.request";
+    public static final String GET_SEARCHES_TO_CRAWL_REQUEST_QUEUE = "jobs.request.searchToCrawl.queue";
+    public static final String GET_SEARCHES_TO_CRAWL_ROUTING_KEY = "jobs.searchToCrawl.request";
+    public static final String CRAWL_SEARCHES_REQUEST_QUEUE = "jobs.request.crawlSearches.queue";
+    public static final String CRAWL_SEARCHES_ROUTING_KEY = "jobs.crawlSearches.request";
+    public static final String GET_ALL_JOBS_REQUEST_QUEUE = "jobs.request.getAllJobs.queue";
+    public static final String GET_ALL_JOBS_ROUTING_KEY = "jobs.getAllJobs.request";
 
     @Bean
-    public Queue replyJobs() {
-        return new Queue(REQUEST_QUEUE);
+    public Queue getSearchesToCrawlQueue() {
+        return new Queue(GET_SEARCHES_TO_CRAWL_REQUEST_QUEUE);
+    }
+    @Bean
+    public Queue crawlSearchesQueue() {
+        return new Queue(CRAWL_SEARCHES_REQUEST_QUEUE);
     }
 
     @Bean
-    public MessageConverter messageConverter() {
+    public Queue getAllJobsQueue(){
+        return new Queue(GET_ALL_JOBS_REQUEST_QUEUE);
+    }
+
+
+    @Bean
+    public MessageConverter jobMessageConverter() {
         JacksonJsonMessageConverter converter =
                 new JacksonJsonMessageConverter();
 
@@ -33,9 +49,14 @@ public class RabbitMQJobConfig {
         Map<String, Class<?>> idClassMapping = new HashMap<>();
 
         idClassMapping.put(
-                "com.JobHafen.PostgreSQLService.dto.Message",
-                com.JobHafen.Proxy.dto.Message.class
+                "com.JobHafen.PostgreSQLService.dto.JobEntityDto",
+                com.JobHafen.Proxy.dto.JobEntityDto.class
         );
+        idClassMapping.put(
+                "com.JobHafen.Proxy.PostgreSQLService.SearchToCrawlDto",
+                com.JobHafen.Proxy.dto.SearchToCrawlDto.class
+        );
+
 
         classMapper.setIdClassMapping(idClassMapping);
 
@@ -45,23 +66,61 @@ public class RabbitMQJobConfig {
     }
 
     @Bean
-    public DirectExchange exchange() {
+    public DirectExchange jobExchange() {
         return new DirectExchange(EXCHANGE);
     }
 
     @Bean
-    public Binding binding() {
+    public Binding getSearchesToCrawlBinding(
+            @Qualifier("getSearchesToCrawlQueue") Queue queue,
+            DirectExchange jobExchange) {
         return BindingBuilder
-                .bind(replyJobs())
-                .to(exchange())
-                .with(ROUTING_KEY);
+                .bind(queue)
+                .to(jobExchange)
+                .with(GET_SEARCHES_TO_CRAWL_ROUTING_KEY);
+    }
+    @Bean
+    public Binding crawlSearchesBinding(
+            @Qualifier("crawlSearchesQueue") Queue queue,
+            DirectExchange jobExchange) {
+        return BindingBuilder
+                .bind(queue)
+                .to(jobExchange)
+                .with(CRAWL_SEARCHES_ROUTING_KEY);
     }
 
     @Bean
-    public RabbitTemplate template(ConnectionFactory connectionFactory){
+    public Binding getAllJObsBinding (
+            @Qualifier("getAllJobsQueue") Queue queue,
+            DirectExchange jobExchange
+    ) {
+        return BindingBuilder
+                .bind(queue)
+                .to(jobExchange)
+                .with(GET_ALL_JOBS_ROUTING_KEY);
+
+    }
+
+    @Bean
+    public RabbitTemplate jobTemplate(ConnectionFactory connectionFactory){
         RabbitTemplate template = new RabbitTemplate(connectionFactory);
-        template.setMessageConverter(messageConverter());
+        template.setMessageConverter(jobMessageConverter());
         template.setReplyTimeout(10000);
         return template;
     }
+    @Bean
+    public SimpleRabbitListenerContainerFactory searchListenerFactory(
+            ConnectionFactory connectionFactory,
+            @Qualifier("jobMessageConverter")
+            MessageConverter messageConverter) {
+
+        SimpleRabbitListenerContainerFactory factory =
+                new SimpleRabbitListenerContainerFactory();
+
+        factory.setConnectionFactory(connectionFactory);
+        factory.setMessageConverter(messageConverter);
+
+        return factory;
+    }
 }
+
