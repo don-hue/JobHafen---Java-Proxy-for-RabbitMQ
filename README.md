@@ -12,7 +12,7 @@
 4. [Vision](#-vision)
 ---
 
-## 📂 Java Crawler
+## 📂 Java Proxy Service
 
 Ein Proxy Service, der Https-Requests annimmt und in ein RabbitMQ-Event übersetzt. Der Service soll als das "Gehirn" der Event-Prozesse dienen 
 ähnlich einem Orchestrator mit einem SAGA-Pattern.
