@@ -4,8 +4,6 @@ import com.JobHafen.Proxy.config.RabbitMQJobConfig;
 import com.JobHafen.Proxy.dto.JobEntityDto;
 import com.JobHafen.Proxy.dto.JobUpdateAppliedDto;
 import com.JobHafen.Proxy.dto.SearchToCrawlDto;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
