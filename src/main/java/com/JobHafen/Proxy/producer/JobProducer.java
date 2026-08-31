@@ -2,12 +2,14 @@ package com.JobHafen.Proxy.producer;
 
 import com.JobHafen.Proxy.config.RabbitMQJobConfig;
 import com.JobHafen.Proxy.dto.JobEntityDto;
+import com.JobHafen.Proxy.dto.JobUpdateAppliedDto;
 import com.JobHafen.Proxy.dto.SearchToCrawlDto;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -50,5 +52,13 @@ public class JobProducer {
                new ParameterizedTypeReference<List<JobEntityDto>>(){}
        );
 
+    }
+
+    public ResponseEntity<Void> updateJobIsApplied(JobUpdateAppliedDto jobUpdateAppliedDto) {
+        return rabbitTemplate.convertSendAndReceiveAsType(
+                RabbitMQJobConfig.EXCHANGE,
+                RabbitMQJobConfig.PUT_JOB_APPLIED_JOBS_ROUTING_KEY,
+                jobUpdateAppliedDto,
+                new ParameterizedTypeReference<ResponseEntity<Void>>() {});
     }
 }

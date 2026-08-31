@@ -25,10 +25,16 @@ public class RabbitMQSearchConfig {
     public static final String GET_SEARCH_QUEUE = "search.get.queue";
     public static final String GET_SEARCH_ROUTING_KEY = "search.get.request";
 
+    public static final String DELETE_SEARCH_QUEUE = "search.delete.queue";
+    public static final String DELETE_SEARCH_ROUTING_KEY = "search.delete.request";
+
     @Bean
     public Queue saveSearchQueue() {return new Queue(SAVE_SEARCH_QUEUE);}
     @Bean
     public Queue getSearchQueue() {return new Queue(GET_SEARCH_QUEUE);}
+
+    @Bean
+    public Queue deleteSearchQueue(){return new Queue(DELETE_SEARCH_QUEUE);}
 
     @Bean
     public MessageConverter searchMessageConverter() {
@@ -79,6 +85,15 @@ public class RabbitMQSearchConfig {
                 .bind(queue)
                 .to(searchExchange)
                 .with(GET_SEARCH_ROUTING_KEY);
+    }
+    @Bean
+    public Binding deleteSearchBinding(
+            @Qualifier("deleteSearchQueue") Queue queue,
+            DirectExchange searchExchange) {
+        return BindingBuilder
+                .bind(queue)
+                .to(searchExchange)
+                .with(DELETE_SEARCH_ROUTING_KEY);
     }
 
     @Bean

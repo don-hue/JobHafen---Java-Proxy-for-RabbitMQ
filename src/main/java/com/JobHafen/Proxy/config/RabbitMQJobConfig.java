@@ -23,6 +23,8 @@ public class RabbitMQJobConfig {
     public static final String CRAWL_SEARCHES_ROUTING_KEY = "jobs.crawlSearches.request";
     public static final String GET_ALL_JOBS_REQUEST_QUEUE = "jobs.request.getAllJobs.queue";
     public static final String GET_ALL_JOBS_ROUTING_KEY = "jobs.getAllJobs.request";
+    public static final String PUT_JOB_APPLIED_REQUEST_QUEUE = "jobs.request.updateJobApplied.queue";
+    public static final String PUT_JOB_APPLIED_JOBS_ROUTING_KEY = "jobs.updateJobApplied.request";
 
     @Bean
     public Queue getSearchesToCrawlQueue() {
@@ -36,6 +38,10 @@ public class RabbitMQJobConfig {
     @Bean
     public Queue getAllJobsQueue(){
         return new Queue(GET_ALL_JOBS_REQUEST_QUEUE);
+    }
+    @Bean
+    public Queue putJobAppliedQueue(){
+        return new Queue(PUT_JOB_APPLIED_REQUEST_QUEUE);
     }
 
 
@@ -99,6 +105,17 @@ public class RabbitMQJobConfig {
                 .to(jobExchange)
                 .with(GET_ALL_JOBS_ROUTING_KEY);
 
+    }
+
+    @Bean
+    public Binding putJobAppliedBinding(
+            @Qualifier ("putJobAppliedQueue") Queue queue,
+            DirectExchange jobExchange
+    ){
+        return BindingBuilder
+                .bind(queue)
+                .to(jobExchange)
+                .with(PUT_JOB_APPLIED_JOBS_ROUTING_KEY);
     }
 
     @Bean
