@@ -1,14 +1,13 @@
 package com.JobHafen.Proxy.producer;
 
 import com.JobHafen.Proxy.config.RabbitMQSearchConfig;
-import com.JobHafen.Proxy.dto.SearchDto;
-import com.JobHafen.Proxy.dto.SearchEntityDto;
+import de.TheDonJuan.dto.ResponseDto;
+import de.TheDonJuan.dto.search.SearchDto;
+import de.TheDonJuan.dto.search.SearchEntityDto;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 @Service
@@ -36,12 +35,12 @@ public class SearchProducer {
         );
     }
 
-    public ResponseEntity<Void> publishDeleteSearch(Long searchId){
+    public ResponseDto publishDeleteSearch(Long searchId){
         return rabbitTemplate.convertSendAndReceiveAsType(
                 RabbitMQSearchConfig.EXCHANGE,
                 RabbitMQSearchConfig.DELETE_SEARCH_ROUTING_KEY,
                 searchId,
-                new ParameterizedTypeReference<ResponseEntity<Void>>() {}
+                new ParameterizedTypeReference<ResponseDto>() {}
         );
     }
 }

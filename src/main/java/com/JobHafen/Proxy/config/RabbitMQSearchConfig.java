@@ -1,5 +1,7 @@
 package com.JobHafen.Proxy.config;
 
+import com.JobHafen.Proxy.dto.ResponseDto;
+import com.JobHafen.Proxy.dto.search.SearchEntityDto;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.DirectExchange;
@@ -38,28 +40,7 @@ public class RabbitMQSearchConfig {
 
     @Bean
     public MessageConverter searchMessageConverter() {
-        JacksonJsonMessageConverter converter =
-                new JacksonJsonMessageConverter();
-
-        DefaultClassMapper classMapper = new DefaultClassMapper();
-
-        Map<String, Class<?>> idClassMapping = new HashMap<>();
-
-        idClassMapping.put(
-                "com.JobHafen.PostgreSQLService.dto.Message",
-                com.JobHafen.Proxy.dto.Message.class
-        );
-
-        idClassMapping.put(
-                "com.JobHafen.PostgreSQLService.dto.SearchEntityDto",
-                com.JobHafen.Proxy.dto.SearchEntityDto.class
-        );
-
-        classMapper.setIdClassMapping(idClassMapping);
-
-        converter.setClassMapper(classMapper);
-
-        return converter;
+        return new JacksonJsonMessageConverter();
     }
 
     @Bean

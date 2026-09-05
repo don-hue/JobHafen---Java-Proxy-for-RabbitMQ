@@ -4,15 +4,11 @@ import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.amqp.support.converter.DefaultClassMapper;
 import org.springframework.amqp.support.converter.JacksonJsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Configuration
 public class RabbitMQJobConfig {
@@ -47,28 +43,7 @@ public class RabbitMQJobConfig {
 
     @Bean
     public MessageConverter jobMessageConverter() {
-        JacksonJsonMessageConverter converter =
-                new JacksonJsonMessageConverter();
-
-        DefaultClassMapper classMapper = new DefaultClassMapper();
-
-        Map<String, Class<?>> idClassMapping = new HashMap<>();
-
-        idClassMapping.put(
-                "com.JobHafen.PostgreSQLService.dto.JobEntityDto",
-                com.JobHafen.Proxy.dto.JobEntityDto.class
-        );
-        idClassMapping.put(
-                "com.JobHafen.Proxy.PostgreSQLService.SearchToCrawlDto",
-                com.JobHafen.Proxy.dto.SearchToCrawlDto.class
-        );
-
-
-        classMapper.setIdClassMapping(idClassMapping);
-
-        converter.setClassMapper(classMapper);
-
-        return converter;
+       return new JacksonJsonMessageConverter();
     }
 
     @Bean

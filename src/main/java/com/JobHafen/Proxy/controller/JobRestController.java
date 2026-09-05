@@ -1,7 +1,8 @@
 package com.JobHafen.Proxy.controller;
 
-import com.JobHafen.Proxy.dto.JobEntityDto;
-import com.JobHafen.Proxy.dto.JobUpdateAppliedDto;
+import de.TheDonJuan.dto.ResponseDto;
+import de.TheDonJuan.dto.job.JobEntityDto;
+import de.TheDonJuan.dto.job.JobUpdateAppliedDto;
 import com.JobHafen.Proxy.producer.JobProducer;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,11 +21,21 @@ public class JobRestController {
 
     @GetMapping("/getJobsRequest")
     public List<JobEntityDto> publishGetJobs() {
-        return jobProducer.getJobsRequest();
+        try{
+            return jobProducer.getJobsRequest();
+        } catch (Exception e) {
+            System.out.println("Error in JobRestcontroller" + e.getMessage());
+            throw e;
+        }
     }
 
     @PutMapping("/updateJobAppliedRequest")
     public ResponseEntity<Void> publishUpdateJob(JobUpdateAppliedDto jobUpdateAppliedDto) {
-        return jobProducer.updateJobIsApplied(jobUpdateAppliedDto);
+        ResponseDto response = jobProducer.updateJobIsApplied(jobUpdateAppliedDto);
+        if(response.processed()) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 }
